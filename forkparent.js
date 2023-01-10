@@ -1,6 +1,6 @@
+import crypto from 'node:crypto'
 import { fork } from 'node:child_process'
 import fs from 'node:fs'
-import crypto from 'node:crypto'
 
 // Read the file that we want to encrypt
 const fileContent = fs.readFileSync('./file.txt', 'utf8')

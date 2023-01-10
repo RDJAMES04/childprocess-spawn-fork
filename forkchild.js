@@ -8,7 +8,6 @@ process.on('message', (data) => {
     // Encrypt the file using the public key
     const encryptedFile = crypto.publicEncrypt(publicKey, file)
     process.send(encryptedFile)
-    // process.stdout.write(encryptedFile)
   } catch (err) {
     console.error(err)
   }

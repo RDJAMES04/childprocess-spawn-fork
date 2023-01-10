@@ -1,6 +1,6 @@
-import { spawn } from 'node:child_process'
-import fs from 'node:fs'
 import crypto from 'node:crypto'
+import fs from 'node:fs'
+import { spawn } from 'node:child_process'
 
 // Read the file that we want to encrypt
 const fileContent = fs.readFileSync('./file.txt', 'utf8')
