@@ -20,30 +20,31 @@ const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
   },
 })
 
-// Spawn a child process
+// Fork a child process
 const child = fork('./forkchild.js')
 
 // Send the public key and file to the child
-child.send(Buffer.from(JSON.stringify([publicKey, fileContent])))
-// child.stdin.write(JSON.stringify([publicKey, fileContent]))
+child.send(JSON.stringify([publicKey, fileContent]))
 
 // Receive the encrypted file from the child
 child.on('message', (data) => {
   const encryptedFile = data
 
-  const startTime = Date.now()
+  // const startTime = Date.now()
 
-//   try {
-//     const decryptedFile = crypto.privateDecrypt({ key: privateKey, passphrase: 'passphrase' }, (encryptedFile))
+  try {
+    const decryptedFile = crypto.privateDecrypt({ key: privateKey, passphrase: 'passphrase' }, Buffer.from(encryptedFile))
 
-//     child.kill()
-//     const endTime = Date.now()
-//     // Verify that the encrypted file is actually the original file
-//     console.log(`Verification ${(decryptedFile.toString() === fileContent) ? 'succeeded' : 'failed'}.`)
-//     console.log(`Execution time: ${endTime - startTime}ms.`)
-//     const memoryUsage = process.memoryUsage()
-//     console.log(`Memory usage: ${memoryUsage.rss} bytes`)
-//   } catch (err) {
-//     console.error(err)
-//   }
+    child.kill()
+
+    // Verify that the encrypted file is actually the original file
+    const memoryUsage = process.memoryUsage()
+    console.table({
+      Verification: `${(decryptedFile.toString() === fileContent) ? 'succeeded' : 'failed'}`,
+      Memory: `${memoryUsage.rss} bytes`,
+      Uptime: `${process.uptime()} seconds`,
+    })
+  } catch (err) {
+    console.error(err)
+  }
 })

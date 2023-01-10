@@ -21,7 +21,7 @@ const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
 })
 
 // Spawn a child process
-const child = spawn('node', ['./pushchild.js'])
+const child = spawn('node', ['./spawnchild.js'])
 
 // Send the public key and file to the child
 child.stdin.write(JSON.stringify([publicKey, fileContent]))
@@ -30,18 +30,18 @@ child.stdin.write(JSON.stringify([publicKey, fileContent]))
 child.stdout.on('data', (data) => {
   const encryptedFile = data
 
-  const startTime = Date.now()
-
   try {
     const decryptedFile = crypto.privateDecrypt({ key: privateKey, passphrase: 'passphrase' }, (encryptedFile))
 
     child.kill()
-    const endTime = Date.now()
+
     // Verify that the encrypted file is actually the original file
-    console.log(`Verification ${(decryptedFile.toString() === fileContent) ? 'succeeded' : 'failed'}.`)
-    console.log(`Execution time: ${endTime - startTime}ms.`)
     const memoryUsage = process.memoryUsage()
-    console.log(`Memory usage: ${memoryUsage.rss} bytes`)
+    console.table({
+      Verification: `${(decryptedFile.toString() === fileContent) ? 'succeeded' : 'failed'}`,
+      Memory: `${memoryUsage.rss} bytes`,
+      Uptime: `${process.uptime()} seconds`,
+    })
   } catch (err) {
     console.error(err)
   }
